@@ -539,6 +539,11 @@ const Util = {
 	ytDescSeparator: ' · ',
 
 	ytTitleRegExps: [
+		// "Track" - Artist, 'Track' - Artist, "Track" Artist, etc.
+		{
+			pattern: /[『｢「"'](.+?)['"」｣』][\s:—-]+(.+)/,
+			groups: { artist: 2, track: 1 },
+		},
 		// Artist "Track", Artist: "Track", Artist - "Track", etc.
 		{
 			pattern: /(.+?)([\s:—-])+\s*"(.+?)"/,
