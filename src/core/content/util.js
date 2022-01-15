@@ -579,7 +579,7 @@ const Util = {
 		title = title.replace(/^\s*([a-zA-Z]{1,2}|[0-9]{1,2})[1-9]?\.\s+/i, '');
 
 		// Remove - preceding opening bracket
-		title = title.replace(/-\s*([「【『])/, '$1');
+		title = title.replace(/-\s*([[「【『])/, '$1');
 
 		// 【/(*Music Video/MV/PV*】/)
 		title = title.replace(/[(【].*?((MV)|(PV)).*?[】)]/i, '');
@@ -588,7 +588,7 @@ const Util = {
 		title = title.replace(/[(【]((オリジナル)|(東方)).*?[】)]/, '');
 
 		// MV/PV if followed by an opening/closing bracket
-		title = title.replace(/(MV|PV)([「【『』】」])/i, '$2');
+		title = title.replace(/(MV|PV)([[「【『』】」\]])/i, '$2');
 
 		// MV/PV if ending and with whitespace in front
 		title = title.replace(/\s+(MV|PV)$/i, '');
