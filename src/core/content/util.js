@@ -541,7 +541,7 @@ const Util = {
 	ytTitleRegExps: [
 		// Artist "Track", Artist: "Track", Artist - "Track", etc.
 		{
-			pattern: /(.+?)([\s:—-])+\s*"(.+?)"/,
+			pattern: /(.+?)([\s:—-])+\s*["'](.+?)['"]/,
 			groups: { artist: 1, track: 3 },
 		},
 		// Artist「Track」 (Japanese tracks)
