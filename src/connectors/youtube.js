@@ -44,6 +44,8 @@ const allowedCategories = [];
  */
 const categoryCache = new Map();
 
+let ignoreUnverifiedArtistsMetadata = false;
+
 let currentVideoDescription = null;
 let artistTrackFromDescription = null;
 
@@ -225,6 +227,9 @@ async function readConnectorOptions() {
 	}
 	if (await Util.getOption('YouTube', 'scrobbleEntertainmentOnly')) {
 		allowedCategories.push(categoryEntertainment);
+	}
+	if (await Util.getOption('YouTube', 'onlyUseVerifiedArtistMetadata')) {
+		ignoreUnverifiedArtistsMetadata = true;
 	}
 	Util.debugLog(`Allowed categories: ${allowedCategories.join(', ')}`);
 }

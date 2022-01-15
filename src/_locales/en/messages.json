@@ -80,6 +80,14 @@
     "message": "Ignore videos that are not in Entertainment category",
     "description": "Option title"
   },
+  "optionYtMetadataOnlyVerified": {
+    "message": "Ignore \"Music in this video\" data from non-verified artist channels",
+    "description": "Option label"
+  },
+  "optionYtMetadataOnlyVerifiedTitle": {
+    "message": "Ignore metadata from non-verified artists",
+    "description": "Option title"
+  },
 
   "optionsAccounts": {
     "message": "Accounts",

@@ -24,6 +24,7 @@ define((require) => {
 		YouTube: {
 			'#yt-music-only': 'scrobbleMusicOnly',
 			'#yt-entertainment-only': 'scrobbleEntertainmentOnly',
+			'#yt-metadata-only-verified': 'onlyUseVerifiedArtistMetadata',
 		},
 	};
 
