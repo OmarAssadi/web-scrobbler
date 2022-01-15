@@ -24,6 +24,9 @@ const videoTitleSelector = '.html5-video-player .ytp-title-link';
 const channelNameSelector = '#top-row .ytd-channel-name a';
 const channelVerifiedArtistBadgeSelector = '#meta-contents .badge-style-type-verified-artist';
 const videoDescriptionSelector = '#meta-contents #description';
+const videoMetadataSelector = '#collapsible .ytd-metadata-row-container-renderer';
+const videoMetadataKeySelector = '#title .ytd-metadata-row-renderer';
+const videoMetadataValueSelector = '#content .ytd-metadata-row-renderer';
 
 // Dummy category indicates an actual category is being fetched
 const categoryPending = 'YT_DUMMY_CATEGORY_PENDING';
@@ -53,6 +56,7 @@ let artistTrackFromDescription = null;
 const trackInfoGetters = [
 	getTrackInfoFromChapters,
 	getTrackInfoFromDescription,
+	getTrackInfoFromMetadata,
 	getTrackInfoFromTitle,
 ];
 
@@ -251,9 +255,49 @@ function getTrackInfoFromDescription() {
 	return artistTrackFromDescription;
 }
 
+function getVideoMetadata() {
+	const elements = $(videoMetadataSelector);
+	if (elements) {
+		const entries = [];
+		for (const element of elements) {
+			if (!element) {
+				continue;
+			}
+			const key = $(element).find(videoMetadataKeySelector);
+			const value = $(element).find(videoMetadataValueSelector);
+			if (key && value) {
+				entries.push({
+					key: $(key).text(),
+					value: $(value).text(),
+				});
+			}
+		}
+		return entries;
+	}
+}
 
 function isChannelVerifiedArtist() {
 	return $(channelVerifiedArtistBadgeSelector).length > 0;
+}
+
+function getTrackInfoFromMetadata() {
+	const metadata = getVideoMetadata();
+	if (!metadata || metadata.length < 1) {
+		return;
+	}
+	if (ignoreUnverifiedArtistsMetadata && !isChannelVerifiedArtist()) {
+		return;
+	}
+	let track;
+	let artist;
+	for (const entry of metadata) {
+		if (entry.key.includes('Song') && entry.value.length > 0) {
+			track = entry.value;
+		} else if (entry.key.includes('Artist') && entry.value.length > 0) {
+			artist = entry.value;
+		}
+	}
+	return { artist, track };
 }
 
 function getTrackInfoFromChapters() {
