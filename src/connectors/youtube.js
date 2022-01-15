@@ -22,6 +22,7 @@ const videoSelector = '.html5-main-video';
 const chapterNameSelector = '.html5-video-player .ytp-chapter-title-content';
 const videoTitleSelector = '.html5-video-player .ytp-title-link';
 const channelNameSelector = '#top-row .ytd-channel-name a';
+const channelVerifiedArtistBadgeSelector = '#meta-contents .badge-style-type-verified-artist';
 const videoDescriptionSelector = '#meta-contents #description';
 
 // Dummy category indicates an actual category is being fetched
@@ -248,6 +249,11 @@ function getTrackInfoFromDescription() {
 	artistTrackFromDescription = Util.parseYtVideoDescription(description);
 
 	return artistTrackFromDescription;
+}
+
+
+function isChannelVerifiedArtist() {
+	return $(channelVerifiedArtistBadgeSelector).length > 0;
 }
 
 function getTrackInfoFromChapters() {
