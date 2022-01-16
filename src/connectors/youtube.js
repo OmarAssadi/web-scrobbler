@@ -290,14 +290,17 @@ function getTrackInfoFromMetadata() {
 	}
 	let track;
 	let artist;
+	let album;
 	for (const entry of metadata) {
 		if (entry.key.includes('Song') && entry.value.length > 0) {
 			track = entry.value;
 		} else if (entry.key.includes('Artist') && entry.value.length > 0) {
 			artist = entry.value;
+		} else if (entry.key.includes('Album') && entry.value.length > 0) {
+			album = entry.value;
 		}
 	}
-	return { artist, track };
+	return { artist, track, album };
 }
 
 function getTrackInfoFromChapters() {
