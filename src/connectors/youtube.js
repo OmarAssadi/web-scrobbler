@@ -24,9 +24,7 @@ const videoTitleSelector = '.html5-video-player .ytp-title-link';
 const channelNameSelector = '#top-row .ytd-channel-name a';
 const channelVerifiedArtistBadgeSelector = '#meta-contents .badge-style-type-verified-artist';
 const videoDescriptionSelector = '#meta-contents #description';
-const videoMetadataSelector = '#collapsible .ytd-metadata-row-container-renderer';
-const videoMetadataKeySelector = '#title .ytd-metadata-row-renderer';
-const videoMetadataValueSelector = '#content .ytd-metadata-row-renderer';
+const ytInitialDataSelector = 'script:contains(var ytInitialData)';
 
 // Dummy category indicates an actual category is being fetched
 const categoryPending = 'YT_DUMMY_CATEGORY_PENDING';
@@ -55,8 +53,8 @@ let artistTrackFromDescription = null;
 
 const trackInfoGetters = [
 	getTrackInfoFromChapters,
-	getTrackInfoFromDescription,
 	getTrackInfoFromMetadata,
+	getTrackInfoFromDescription,
 	getTrackInfoFromTitle,
 ];
 
@@ -255,25 +253,49 @@ function getTrackInfoFromDescription() {
 	return artistTrackFromDescription;
 }
 
-function getVideoMetadata() {
-	const elements = $(videoMetadataSelector);
-	if (elements) {
-		const entries = [];
-		for (const element of elements) {
-			if (!element) {
-				continue;
-			}
-			const key = $(element).find(videoMetadataKeySelector);
-			const value = $(element).find(videoMetadataValueSelector);
-			if (key && value) {
+function getYtInitialData() {
+	const ytInitialData = $(ytInitialDataSelector);
+	if (!ytInitialData || ytInitialData.length < 1) {
+		return;
+	}
+	const text = ytInitialData.text();
+	return JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+}
+
+const getText = (obj) => {
+	if (obj) {
+		return obj.runs ? obj.runs[0].text : obj.simpleText;
+	}
+};
+
+function getVideoMetadataFromInitialData(initialData) {
+	const entries = [];
+	let metadata = [];
+	try {
+		metadata = initialData.contents.twoColumnWatchNextResults.results.results.contents;
+	} catch (ignored) {
+	}
+	const result = metadata.find((v) => v.videoSecondaryInfoRenderer);
+	if (!result) {
+		return {};
+	}
+	try {
+		const metadataRows = (result.metadataRowContainer
+			|| result.videoSecondaryInfoRenderer.metadataRowContainer)
+			.metadataRowContainerRenderer.rows;
+		for (const row of metadataRows) {
+			if (row.metadataRowRenderer) {
+				const title = getText(row.metadataRowRenderer.title).toLowerCase();
+				const contents = row.metadataRowRenderer.contents[0];
 				entries.push({
-					key: $(key).text(),
-					value: $(value).text(),
+					key: title,
+					value: getText(contents),
 				});
 			}
 		}
-		return entries;
+	} catch (ignored) {
 	}
+	return entries;
 }
 
 function isChannelVerifiedArtist() {
@@ -281,7 +303,8 @@ function isChannelVerifiedArtist() {
 }
 
 function getTrackInfoFromMetadata() {
-	const metadata = getVideoMetadata();
+	const initialData = getYtInitialData();
+	const metadata = getVideoMetadataFromInitialData(initialData);
 	if (!metadata || metadata.length < 1) {
 		return;
 	}
@@ -292,11 +315,11 @@ function getTrackInfoFromMetadata() {
 	let artist;
 	let album;
 	for (const entry of metadata) {
-		if (entry.key.includes('Song') && entry.value.length > 0) {
+		if (entry.key === 'song' && entry.value.length > 0) {
 			track = entry.value;
-		} else if (entry.key.includes('Artist') && entry.value.length > 0) {
+		} else if (entry.key === 'artist' && entry.value.length > 0) {
 			artist = entry.value;
-		} else if (entry.key.includes('Album') && entry.value.length > 0) {
+		} else if (entry.key === 'album' && entry.value.length > 0) {
 			album = entry.value;
 		}
 	}
